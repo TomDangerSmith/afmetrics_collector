@@ -236,6 +236,14 @@ def main(args):
             myobj.update(job)
             jupusers.append(myobj.get('users'))
 
+        jobs=get_condor_history(since_insecs=1800)
+        for job in jobs:
+            myobj = {'token': token,
+                     'kind': 'condorjob',
+                     'cluster': cluster}
+            myobj.update(job)
+            jupusers.append(myobj.get('users'))
+
         _logger.info("collecting jupyter-ml metrics")
 #        users=get_jupyter_users(args.ns, args.label)
         users=jupusers
