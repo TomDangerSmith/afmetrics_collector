@@ -19,6 +19,8 @@ UChicago developed, Brookhaven National Lab modified program for collecting batc
 %prep
 rm -rf %{NVdir}
 git clone %{url}.git %{NVdir}
+cd %{NVdir}
+git checkout BNL-production
 
 %build
 
