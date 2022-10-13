@@ -44,7 +44,7 @@ def get_condor_jobs():
 
     return jobs
 
-def get_condor_history(job_status=4, since_insecs=360):
+def get_condor_history(job_status=4, since_insecs=1800):
     jobs = []
     now = time.time()
     keys = ["users", "Id", "Runtime"]

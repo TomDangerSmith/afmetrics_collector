@@ -169,7 +169,7 @@ The associated cron job to run this every 5 minutes (the default and recommended
 
 In addition to ssh users currently logged in, adding the `-S` flag will include users who logged in within the last 5 minutes as well (to account for a possible edge case which includes users that log in and out really fast)
 
-`afmetrics_collector -vv -sjb -S --host -t <token> -c "<cluster>"
+`afmetrics_collector -vv -sjb -S --host -t <token> -c "<cluster>"`
 
 ### Group Filtering
 
@@ -184,8 +184,8 @@ For example, if you are only interested in ssh logins, jupyter, and batch jobs o
 For debugging, you can opt to output everything to a local file instead of sending it to the logstash server with the `-d` flag:
 
 `afmetrics_collector -d -vv -sjb --host -t <token> -c "<cluster>"`  
-This will output .json files in your current directory, and very verbose (`-vv`) logs in `/var/log/afmetrics/afmetrics.log`.  
-I would recommend to run this from within the `/var/log/afmetrics` directory so all the stuff to look at is in one place.  
+This will output .json files in your current directory, and very verbose (`-vv`) logs to stdout.  
+I would recommend to pipe the output to a file `afmetrics.log` by appending `>> afmetrics.log 2>&1` to the command so that the general output can be inspected as well as the json.  
 A **token** is not necessary for debugging, so you can use `-d` before you have one
 
 ### Data Obfuscation and security
