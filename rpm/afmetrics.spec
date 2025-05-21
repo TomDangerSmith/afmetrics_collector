@@ -1,3 +1,5 @@
+# !!! This spec file is deprecated !!! please build the package with 'python3 setup.py bdist_rpm' instead of doing this !!!
+
 Name:		afmetrics-collector
 Version:	1
 Release:	1
