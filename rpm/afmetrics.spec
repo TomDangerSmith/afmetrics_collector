@@ -29,7 +29,7 @@ mkdir -p %{buildroot}/root/afmetrics
 cp -ra %{NVdir}/. %{buildroot}/root/afmetrics
 
 %pre
-pip3 install -U setuptools setuptools_scm wheel importlib_metadata psutil requests kubernetes
+pip3 install -U setuptools==70 setuptools_scm wheel importlib_metadata psutil requests kubernetes
 
 %post
 cd /root/afmetrics
