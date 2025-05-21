@@ -7,9 +7,40 @@ Please install the pick library before running this example.
 import subprocess
 import logging
 import time
+import json
 
 _logger = logging.getLogger(__name__)
 
+def get_condor_queue_summery(queues=[{"name": 'all', "constraint": ""},
+                                     {"name": 'short', "constraint": 'queue == "short"'}]):
+    summery = []
+    for queue in queues:
+        queue_status = {}
+        cmd = ['condor_q', '-all', '-totals', '-json']
+        if queue["constraint"]:
+            cmd = cmd + ["-constraint", queue["constraint"]]
+        with subprocess.Popen(cmd, stdout=subprocess.PIPE) as process:
+            result = json.loads(process.stdout.read())
+            queue_status.update({"queue": queue["name"],
+                                 "idle": result[0]["Idle"],
+                                 "running": result[0]["Running"],
+                                 "held": result[0]["Held"]})
+
+        cmd = ['condor_q', '-all', '-run', '-autoformat', 'CpusProvisioned', 'MemoryProvisioned', '-json']
+        if queue["constraint"]:
+            cmd = cmd + ["-constraint", queue["constraint"]]
+        try:
+            with subprocess.Popen(cmd, stdout=subprocess.PIPE) as process:
+                result = json.loads(process.stdout.read())
+                allocated_cores = sum(int(item.get('CpusProvisioned',0)) for item in result) 
+                allocated_mem = sum(int(item.get('MemoryProvisioned',0)) for item in result) 
+                queue_status.update({"allocated_cores": allocated_cores, "allocated_mem": allocated_mem})
+        except Exception as error:
+            _logger.error(error)
+
+        summery.append(queue_status)
+
+    return summery
 
 def get_condor_jobs():
 
@@ -68,7 +99,7 @@ def get_condor_history(job_status=4, since_insecs=1800):
     return jobs
 
 def main():
-    get_condor_jobs()
+    get_condor_queue_summery()
 
 if __name__ == '__main__':
     main()
