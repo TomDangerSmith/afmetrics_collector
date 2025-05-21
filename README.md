@@ -29,6 +29,27 @@ Install with pip3: `pip3 install dist/afmetrics_collector-0.0*.whl`
 
 `pip3 uninstall afmetrics-collector`
 
+## Installation (RPM)
+
+### Prerequisites:
+
+- Have installed `python3-kubernetes` system package
+
+- Create a directory for the log files: `mkdir /var/log/afmetrics`
+
+### Install afmetrics_collector rpm package:
+
+Clone the git repo onto your server
+
+Navigate to the project directory
+
+(optional) Make changes to setup.cfg
+
+Build with python3: `python3 setup.py bdist_rpm`
+
+Install with yum or dnf: `dnf install dist/afmetrics_collector-0.0*.rpm`
+
+
 ## Sending documents
 
 All the documents should be __POST__ to <https://af.atlas-ml.org>.
@@ -185,7 +206,7 @@ The associated cron job to run this every 5 minutes (the default and recommended
 
 By default no batch queue status is reported. To add queue status reporting, add the queue in this format "queuename:condor query contraint expression". For example the following command will collect status of two queues, the all inclusive queue and the short queue which can be queried with queue=="short" constraint.
 
-`afmetrics_collector -vv -b -t <token> -c "<cluster>" -q all: -q 'short:queue=="short"'  
+`afmetrics_collector -vv -b -t <token> -c "<cluster>" -q all: -q 'short:queue=="short"'`
 
 ### SSH history
 
