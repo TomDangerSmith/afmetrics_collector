@@ -243,8 +243,27 @@ def main(args):
     cluster = args.cluster
     setup_logging(args.loglevel)
     if args.jupyter:
+        # BNL modified jupyter user collection by gathering condor users on jupyter node
+        jupusers = []
+        jobs=get_condor_jobs()
+        for job in jobs:
+            myobj = {'token': token,
+                     'kind': 'condorjob',
+                     'cluster': cluster}
+            myobj.update(job)
+            jupusers.append(myobj.get('users'))
+
+        jobs=get_condor_history(since_insecs=1800)
+        for job in jobs:
+            myobj = {'token': token,
+                     'kind': 'condorjob',
+                     'cluster': cluster}
+            myobj.update(job)
+            jupusers.append(myobj.get('users'))
+
         _logger.info("collecting jupyter-ml metrics")
-        users=get_jupyter_users(args.ns, args.label)
+#        users=get_jupyter_users(args.ns, args.label)
+        users=jupusers
         _logger.info("af jupyter-ml users: %s", users)
 
         if args.group != "":
@@ -277,38 +296,38 @@ def main(args):
             resp = requests.post(url, json=myobj)
             _logger.debug("post status_code:%d",resp.status_code)
 
-        _logger.info("collecting jupyter-coffea metrics")
-        users=get_jupyter_users("coffea-casa", "jhub_user")
-        _logger.info("af jupyter-coffea users: %s", users)
-
-        if args.group != "":
-            # group filter
-            for i, x in enumerate(users[:]):
-                groups = [g.gr_name for g in grp.getgrall() if x in g.gr_mem]
-                gid = pwd.getpwnam(x).pw_gid
-                groups.append(grp.getgrgid(gid).gr_name)
-                if args.group not in groups:
-                    users.remove(x)
-
-        if args.obf_users:
-            # jupyter-coffea user hash
-            for i, x in enumerate(users):
-                users[i] = hashlib.sha256((args.salt+x).encode('utf-8')).hexdigest()[:8]
-
-        myobj = {'token': token,
-                 'kind': 'jupyter-coffea',
-                 'cluster': cluster,
-                 'jupyter_user_count': len(users),
-                 'users': users}
-        if args.debug_local:
-            # For local debugging
-            json_object = json.dumps(myobj, indent=4)
-            with open("jupyter-debug.json", "a") as outfile:
-                outfile.write(json_object)
-        else: # post to logstash
-            _logger.debug("post to logstash: %s", myobj)
-            resp = requests.post(url, json=myobj)
-            _logger.debug("post status_code:%d",resp.status_code)
+#        _logger.info("collecting jupyter-coffea metrics")
+#        users=get_jupyter_users("coffea-casa", "jhub_user")
+#        _logger.info("af jupyter-coffea users: %s", users)
+#
+#        if args.group != "":
+#            # group filter
+#            for i, x in enumerate(users[:]):
+#                groups = [g.gr_name for g in grp.getgrall() if x in g.gr_mem]
+#                gid = pwd.getpwnam(x).pw_gid
+#                groups.append(grp.getgrgid(gid).gr_name)
+#                if args.group not in groups:
+#                    users.remove(x)
+#
+#        if args.obf_users:
+#            # jupyter-coffea user hash
+#            for i, x in enumerate(users):
+#                users[i] = hashlib.sha256((args.salt+x).encode('utf-8')).hexdigest()[:8]
+#
+#        myobj = {'token': token,
+#                 'kind': 'jupyter-coffea',
+#                 'cluster': cluster,
+#                 'jupyter_user_count': len(users),
+#                 'users': users}
+#        if args.debug_local:
+#            # For local debugging
+#            json_object = json.dumps(myobj, indent=4)
+#            with open("jupyter-debug.json", "a") as outfile:
+#                outfile.write(json_object)
+#        else: # post to logstash
+#            _logger.debug("post to logstash: %s", myobj)
+#            resp = requests.post(url, json=myobj)
+#            _logger.debug("post status_code:%d",resp.status_code)
 
     if args.ssh:
         _logger.info("collecting ssh metrics")
